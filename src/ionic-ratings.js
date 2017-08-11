@@ -2,7 +2,7 @@
 //https://github.com/rajeshwarpatlolla/ionic-ratings
 //rajeshwar.patlolla@gmail.com
 
-(function() {
+(function () {
   'use strict';
   angular.module('ionic-ratings', ['ionic'])
     .directive('ionicRatings', ionicRatings);
@@ -27,27 +27,34 @@
         ratingsObj: '=ratingsobj',
         index: '=index'
       },
-      link: function(scope, element, attrs) {
+      link: function (scope, element, attrs) {
 
         //Setting the default values, if they are not passed
-        scope.iconOn = scope.ratingsObj.iconOn || 'ion-ios-star';
-        scope.iconOff = scope.ratingsObj.iconOff || 'ion-ios-star-outline';
-        scope.iconOnColor = scope.ratingsObj.iconOnColor || 'rgb(200, 200, 100)';
-        scope.iconOffColor = scope.ratingsObj.iconOffColor || 'rgb(200, 100, 100)';
-        scope.rating = scope.ratingsObj.rating || 0;
-        scope.minRating = scope.ratingsObj.minRating || 0;
-        scope.readOnly = scope.ratingsObj.readOnly || false;
-        scope.index = scope.index || 0;
+        function setupValue(ratingsObj, updateRating) {
+          scope.iconOn = ratingsObj.iconOn || 'ion-ios-star';
+          scope.iconOff = ratingsObj.iconOff || 'ion-ios-star-outline';
+          // scope.iconOnColor = ratingsObj.iconOnColor || 'rgb(200, 200, 100)';
+          // scope.iconOffColor = ratingsObj.iconOffColor || 'rgb(200, 100, 100)';
+          if (updateRating) {
+            scope.rating = ratingsObj.rating || 0;
+          }
 
-        //Setting the color for the icon, when it is active
-        scope.iconOnColor = {
-          color: scope.iconOnColor
-        };
+          scope.minRating = ratingsObj.minRating || 0;
+          scope.readOnly = ratingsObj.readOnly || false;
+          scope.index = scope.index || 0;
 
-        //Setting the color for the icon, when it is not active
-        scope.iconOffColor = {
-          color: scope.iconOffColor
-        };
+          //Setting the color for the icon, when it is active
+          scope.iconOnColor = {
+            color: ratingsObj.iconOnColor || 'rgb(200, 200, 100)'
+          };
+
+          //Setting the color for the icon, when it is not active
+          scope.iconOffColor = {
+            color: ratingsObj.iconOffColor || 'rgb(200, 100, 100)'
+          };
+        }
+
+        setupValue(scope.ratingsObj, true);
 
         //Setting the rating
         scope.rating = (scope.rating > scope.minRating) ? scope.rating : scope.minRating;
@@ -55,8 +62,31 @@
         //Setting the previously selected rating
         scope.prevRating = 0;
 
-        scope.$watch('ratingsObj.rating', function(newValue, oldValue) {
+        scope.$watch('ratingsObj.rating', function (newValue, oldValue) {
           setRating(newValue);
+        });
+
+        scope.$watch('ratingsObj.readOnly', function (newValue, oldValue) {
+          scope.readOnly = newValue || false;
+        });
+
+        scope.$watch('ratingsObj.iconOn', function (newValue, oldValue) {
+          scope.iconOn = newValue || 'ion-ios-star';
+        });
+        scope.$watch('ratingsObj.iconOff', function (newValue, oldValue) {
+          scope.iconOff = newValue || 'ion-ios-star-outline';
+        });
+        scope.$watch('ratingsObj.iconOnColor', function (newValue, oldValue) {
+          //Setting the color for the icon, when it is active
+          scope.iconOnColor = {
+            color: newValue || 'rgb(200, 200, 100)'
+          };
+        });
+        scope.$watch('ratingsObj.iconOffColor', function (newValue, oldValue) {
+          //Setting the color for the icon, when it is not active
+          scope.iconOffColor = {
+            color: newValue || 'rgb(200, 100, 100)'
+          };
         });
 
         function setRating(val, uiEvent) {
@@ -70,12 +100,12 @@
         }
 
         //Called when he user clicks on the rating
-        scope.ratingsClicked = function(val) {
+        scope.ratingsClicked = function (val) {
           setRating(val, true);
         };
 
         //Called when he user un clicks on the rating
-        scope.ratingsUnClicked = function(val) {
+        scope.ratingsUnClicked = function (val) {
           if (scope.minRating !== 0 && val < scope.minRating) {
             scope.rating = scope.minRating;
           } else {
